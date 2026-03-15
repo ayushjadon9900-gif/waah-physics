@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Waah Physics | Gaurav Sharma</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+:root {
+  --teal: #00d4c8;
+  --ink: #070d0d;
+  --ink2: #0d1a1a;
+  --surface: #112020;
+  --muted: #4a6868;
+  --light: #8ab0b0;
+  --white: #edfafa;
+}
+body { background: var(--ink); color: var(--white); font-family: 'DM Sans', sans-serif; overflow-x: hidden; }
+
+/* INTRO */
+#intro {
+  position: fixed; inset: 0; background: var(--ink); z-index: 9999;
+  display: flex; align-items: center; justify-content: center; flex-direction: column;
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+#intro.hide { opacity: 0; pointer-events: none; transform: scale(1.04); }
+#physics-canvas { position: absolute; inset: 0; }
+.intro-text { position: relative; z-index: 2; text-align: center; }
+.intro-title {
+  font-family: 'Syne', sans-serif; font-size: clamp(2.5rem, 7vw, 5.5rem);
+  font-weight: 800; color: var(--teal); letter-spacing: 0.06em;
+  text-shadow: 0 0 50px rgba(0,212,200,0.5);
+  opacity: 0; animation: popIn 0.7s 0.7s forwards;
+}
+.intro-sub {
+  font-family: 'DM Serif Display', serif; font-style: italic;
+  font-size: clamp(1rem, 2.5vw, 1.5rem); color: var(--light);
+  margin-top: 0.6rem; opacity: 0; animation: popIn 0.7s 1s forwards;
+}
+.intro-bar {
+  width: 180px; height: 2px; background: rgba(0,212,200,0.15);
+  border-radius: 2px; margin: 1.75rem auto 0; overflow: hidden;
+  opacity: 0; animation: popIn 0.5s 1.3s forwards;
+}
+.intro-bar-fill {
+  height: 100%; width: 0; background: var(--teal);
+  box-shadow: 0 0 12px var(--teal); border-radius: 2px;
+  animation: loadBar 1.5s 1.4s forwards;
+}
+@keyframes loadBar { to { width: 100%; } }
+@keyframes popIn { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+
+/* MAIN */
+#main { opacity: 0; transition: opacity 0.8s ease; }
+#main.show { opacity: 1; }
+
+/* NAV */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  padding: 1.4rem 4rem; display: flex; justify-content: space-between; align-items: center;
+  background: rgba(7,13,13,0.93); backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(0,212,200,0.1);
+}
+.nav-brand { display: flex; flex-direction: column; gap: 0.1rem; }
+.nav-title { font-family: 'Syne', sans-serif; font-size: 1.25rem; font-weight: 800; color: var(--teal); letter-spacing: 0.04em; }
+.nav-name { font-size: 0.68rem; font-weight: 500; color: var(--muted); letter-spacing: 0.14em; text-transform: uppercase; }
+.nav-links { display: flex; gap: 2rem; list-style: none; align-items: center; }
+.nav-links a { color: var(--light); text-decoration: none; font-size: 0.8rem; font-weight: 500; letter-spacing: 0.06em; transition: color 0.3s; }
+.nav-links a:hover { color: var(--teal); }
+.nav-wa {
+  display: flex; align-items: center; gap: 0.5rem;
+  background: #25d366; color: #000 !important; padding: 0.55rem 1.25rem;
+  border-radius: 100px; font-weight: 700 !important; font-size: 0.74rem !important;
+  transition: all 0.3s;
+}
+.nav-wa:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(37,211,102,0.35); }
+
+/* HERO */
+.hero {
+  padding: 6rem 4rem 5rem; text-align: center; position: relative;
+  border-bottom: 1px solid rgba(0,212,200,0.07);
+}
+.hero::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse 60% 50% at 50% 0%, rgba(0,212,200,0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero-tag {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  background: rgba(0,212,200,0.07); border: 1px solid rgba(0,212,200,0.2);
+  color: var(--teal); font-size: 0.68rem; font-weight: 600;
+  letter-spacing: 0.2em; text-transform: uppercase;
+  padding: 0.4rem 1.1rem; border-radius: 100px; margin-bottom: 2rem;
+}
+.dot { width: 6px; height: 6px; border-radius: 50%; background: var(--teal); animation: blink 1.4s infinite; }
+@keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.2;} }
+.hero-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(3rem, 7vw, 6rem); line-height: 1.05; margin-bottom: 1.25rem;
+}
+.hero-title .teal { color: var(--teal); }
+.hero-title .italic { font-style: italic; }
+.hero-sub { font-size: 1.05rem; color: var(--light); max-width: 500px; margin: 0 auto 2.5rem; line-height: 1.75; }
+.hero-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+.btn {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.9rem 2rem; border-radius: 100px;
+  font-family: 'Syne', sans-serif; font-size: 0.78rem; font-weight: 700;
+  letter-spacing: 0.08em; text-decoration: none; transition: all 0.3s; cursor: pointer; border: none;
+}
+.btn-teal { background: var(--teal); color: var(--ink); }
+.btn-teal:hover { background: var(--white); transform: translateY(-3px); box-shadow: 0 12px 30px rgba(0,212,200,0.25); }
+.btn-outline { border: 1.5px solid rgba(0,212,200,0.3); color: var(--teal); background: transparent; }
+.btn-outline:hover { background: rgba(0,212,200,0.07); transform: translateY(-3px); border-color: var(--teal); }
+
+/* CHAPTERS */
+.chapters { padding: 5rem 4rem; background: var(--ink2); }
+.sec-label {
+  font-family: 'Syne', sans-serif; font-size: 0.65rem; font-weight: 700;
+  letter-spacing: 0.3em; text-transform: uppercase; color: var(--teal);
+  display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;
+}
+.sec-label::before { content: ''; width: 20px; height: 1.5px; background: var(--teal); }
+.sec-title { font-family: 'DM Serif Display', serif; font-size: clamp(1.8rem, 3vw, 2.6rem); margin-bottom: 0.75rem; }
+.sec-title em { font-style: italic; color: var(--teal); }
+.sec-desc { font-size: 0.9rem; color: var(--muted); margin-bottom: 3rem; max-width: 480px; line-height: 1.7; }
+
+.chapters-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 1px; background: rgba(0,212,200,0.07);
+  border: 1px solid rgba(0,212,200,0.07);
+}
+.chapter-card {
+  background: var(--ink2); padding: 2rem; transition: all 0.3s;
+  position: relative; overflow: hidden; cursor: pointer;
+}
+.chapter-card::after {
+  content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+  height: 2px; background: var(--teal);
+  transform: scaleX(0); transition: transform 0.35s;
+}
+.chapter-card:hover { background: var(--surface); }
+.chapter-card:hover::after { transform: scaleX(1); }
+.ch-num {
+  font-family: 'Syne', sans-serif; font-size: 0.62rem; font-weight: 700;
+  letter-spacing: 0.2em; color: var(--muted); margin-bottom: 0.6rem; text-transform: uppercase;
+}
+.ch-name { font-family: 'Syne', sans-serif; font-size: 0.92rem; font-weight: 700; color: var(--white); line-height: 1.35; }
+.ch-badge {
+  display: inline-flex; align-items: center; gap: 0.3rem;
+  font-size: 0.62rem; font-weight: 600; letter-spacing: 0.08em;
+  color: var(--teal); border: 1px solid rgba(0,212,200,0.2);
+  padding: 0.22rem 0.6rem; border-radius: 100px; margin-top: 0.75rem;
+}
+
+/* CONNECT */
+.connect { padding: 5rem 4rem; text-align: center; }
+.connect-cards { display: flex; gap: 1.5rem; justify-content: center; margin-top: 3rem; flex-wrap: wrap; }
+.connect-card {
+  display: flex; align-items: center; gap: 1.25rem;
+  padding: 1.75rem 2.5rem; border: 1px solid rgba(0,212,200,0.14);
+  border-radius: 12px; background: var(--ink2);
+  text-decoration: none; transition: all 0.3s; min-width: 260px;
+}
+.connect-card:hover { transform: translateY(-5px); border-color: var(--teal); box-shadow: 0 16px 40px rgba(0,212,200,0.1); }
+.connect-icon { width: 52px; height: 52px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+.wa-icon { background: rgba(37,211,102,0.1); }
+.yt-icon { background: rgba(255,0,0,0.08); }
+.connect-info { text-align: left; }
+.connect-platform { font-family: 'Syne', sans-serif; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.3rem; }
+.connect-value { font-family: 'Syne', sans-serif; font-size: 0.95rem; font-weight: 700; color: var(--white); }
+.connect-arrow { margin-left: auto; color: var(--teal); font-size: 1.1rem; opacity: 0; transform: translateX(-6px); transition: all 0.3s; }
+.connect-card:hover .connect-arrow { opacity: 1; transform: translateX(0); }
+
+/* FOOTER */
+footer {
+  border-top: 1px solid rgba(0,212,200,0.07);
+  padding: 2rem 4rem; display: flex; justify-content: space-between; align-items: center;
+}
+.footer-brand { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 800; color: var(--teal); }
+.footer-copy { font-size: 0.72rem; color: var(--muted); }
+
+/* REVEAL */
+.reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.7s ease, transform 0.7s ease; }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+@media(max-width: 768px) {
+  nav { padding: 1.2rem 1.5rem; }
+  .nav-links { display: none; }
+  .hero, .chapters, .connect { padding: 4rem 1.5rem; }
+  .chapters-grid { grid-template-columns: 1fr 1fr; }
+  footer { padding: 1.5rem; flex-direction: column; gap: 0.75rem; text-align: center; }
+}
+@media(max-width: 480px) { .chapters-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<!-- INTRO -->
+<div id="intro">
+  <canvas id="physics-canvas"></canvas>
+  <div class="intro-text">
+    <div class="intro-title">WAAH PHYSICS</div>
+    <div class="intro-sub">by Gaurav Sharma</div>
+    <div class="intro-bar"><div class="intro-bar-fill"></div></div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div id="main">
+
+  <nav>
+    <div class="nav-brand" style="display:flex;align-items:center;gap:0.75rem;">
+<img src="logo1.jpeg" alt="logo" style="width:42px;height:42px;border-radius:50%;border:2px solid var(--teal);object-fit:cover;">
+<div>
+      <div class="nav-title">WAAH PHYSICS</div>
+      <div class="nav-name">Tutor — Gaurav Sharma</div>
+    </div>
+    <ul class="nav-links">
+      <li><a href="#chapters">Chapters</a></li>
+      <li><a href="#connect">Connect</a></li>
+    </ul>
+    <a href="https://wa.me/919012602769" class="nav-wa nav-links" target="_blank">💬 WhatsApp</a>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-tag"><span class="dot"></span> Class 12 Physics · CBSE Boards </div>
+    <h1 class="hero-title">
+      <span class="teal">Physics</span> let's<br>
+      <span class="italic">make it interesting.</span>
+    </h1>
+    <p class="hero-sub">Handwritten notes, concept clarity & doubt support — everything you need to master Class 12 Physics.</p>
+    <div class="hero-actions">
+      <a href="#chapters" class="btn btn-teal">View Chapters →</a>
+      <a href="#connect" class="btn btn-outline">Contact Gaurav Sir</a>
+    </div>
+  </section>
+
+  <section class="chapters" id="chapters">
+    <div class="sec-label">Class 12 · CBSE Boards</div>
+    <h2 class="sec-title reveal">All <em>14 Chapters</em></h2>
+    <p class="sec-desc reveal">Notes will be added chapter by chapter. Click any chapter once notes are live.</p>
+    <div class="chapters-grid">
+      <div class="chapter-card reveal"><div class="ch-num">Chapter 01</div><div class="ch-name">Electric Charges & Fields</div><span class="ch-badge">📝 Notes Coming</span></div>
+      <div class="chapter-card reveal"><div class="ch-num">Chapter 02</div><div class="ch-name">Electrostatic Potential & Capacitance</div><span class="ch-badge">📝 Notes Coming</span></div>
+      <div class="chapter-card reveal"><div class="ch-num">Chapter 03</div><div class="ch-name">Current Electricity</div><span class="ch-badge">📝 Notes Coming</span></div>
+      <div class="chapter-card reveal"><div class="ch-num">Chapter 04</div><div class="ch-name">Moving Charges & Magnetism</div><span class="ch-badge">📝 Notes Coming</span></div>
+      <div class="chapter-card reveal"><div class="ch-num">Chapter 05</div><div class="ch-name">Magnetism & Matter</div><span class="ch-badge">📝 Notes Coming</span></div>
+      <div class="chapter-card reveal"><div class="ch-num">Chapter 06</div><div class="ch-name">Electromagnetic Induction</div><span class="ch-badge">📝 Notes Coming</span></div>
+      <div class="chapter-card reveal"><div class="ch-num">Chapter 07</div><div class="ch-name">Alternating Current</div><span class="ch-badge">📝 Notes Coming</span></div>
+      <div class="chapter-card reveal"><div class="ch-num">Chapter 08</div><div class="ch-name">Electromagnetic Waves</div><span class="ch-badge">📝 Notes Coming</span></div>
+      <div class="chapter-card reveal"><div class="ch-num">Chapter 09</div><div class="ch-name">Ray Optics & Optical Instruments</div><span class="ch-badge">📝 Notes Coming</span></div>
+      <div class="chapter-card reveal"><div class="ch-num">Chapter 10</div><div class="ch-name">Wave Optics</div><span class="ch-badge">📝 Notes Coming</span></div>
+      <div class="chapter-card reveal"><div class="ch-num">Chapter 11</div><div class="ch-name">Dual Nature of Radiation & Matter</div><span class="ch-badge">📝 Notes Coming</span></div>
+      <div class="chapter-card reveal"><div class="ch-num">Chapter 12</div><div class="ch-name">Atoms</div><span class="ch-badge">📝 Notes Coming</span></div>
+      <div class="chapter-card reveal"><div class="ch-num">Chapter 13</div><div class="ch-name">Nuclei</div><span class="ch-badge">📝 Notes Coming</span></div>
+      <div class="chapter-card reveal"><div class="ch-num">Chapter 14</div><div class="ch-name">Semiconductor Electronics</div><span class="ch-badge">📝 Notes Coming</span></div>
+    </div>
+  </section>
+
+  <section class="connect" id="connect">
+    <div class="sec-label" style="justify-content:center;">Connect</div>
+    <h2 class="sec-title reveal">Reach <em>Gaurav Sir</em></h2>
+    <p style="font-size:0.92rem;color:var(--muted);margin-top:0.5rem;" class="reveal">For doubts, enrollment, or just to say hi 👋</p>
+    <div class="connect-cards">
+      <a href="https://wa.me/919012602769" class="connect-card reveal" target="_blank">
+        <div class="connect-icon wa-icon">💬</div>
+        <div class="connect-info">
+          <div class="connect-platform">WhatsApp</div>
+          <div class="connect-value">+91 9012602769</div>
+        </div>
+        <div class="connect-arrow">→</div>
+      </a>
+      <a href="https://youtube.com/@waahphysics52?si=Noof2HjQ0ncr_5lh" class="connect-card reveal" target="_blank">
+        <div class="connect-icon yt-icon">▶️</div>
+        <div class="connect-info">
+          <div class="connect-platform">https://youtube.com/@waahphysics52?si=Noof2HjQ0ncr_5lh</div>
+          <div class="connect-value">Waah Physics</div>
+        </div>
+        <div class="connect-arrow">→</div>
+      </a>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-brand">WAAH PHYSICS</div>
+    <div class="footer-copy">© 2025 Gaurav Sharma · All rights reserved</div>
+  </footer>
+
+</div>
+
+<script>
+// PHYSICS INTRO ANIMATION
+const canvas = document.getElementById('physics-canvas');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+const particles = Array.from({length: 80}, () => ({
+  x: Math.random() * canvas.width,
+  y: Math.random() * canvas.height,
+  vx: (Math.random() - 0.5) * 1.2,
+  vy: (Math.random() - 0.5) * 1.2,
+  r: Math.random() * 2.5 + 1,
+  opacity: Math.random() * 0.5 + 0.2,
+}));
+
+let animId;
+function drawIntro() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  for (let i = 0; i < particles.length; i++) {
+    for (let j = i + 1; j < particles.length; j++) {
+      const dx = particles[i].x - particles[j].x;
+      const dy = particles[i].y - particles[j].y;
+      const d = Math.sqrt(dx*dx + dy*dy);
+      if (d < 130) {
+        ctx.beginPath();
+        ctx.strokeStyle = `rgba(0,212,200,${0.18*(1-d/130)})`;
+        ctx.lineWidth = 0.8;
+        ctx.moveTo(particles[i].x, particles[i].y);
+        ctx.lineTo(particles[j].x, particles[j].y);
+        ctx.stroke();
+      }
+    }
+  }
+  particles.forEach(p => {
+    p.x += p.vx; p.y += p.vy;
+    if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+    if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+    ctx.fillStyle = `rgba(0,212,200,${p.opacity})`;
+    ctx.shadowBlur = 8; ctx.shadowColor = '#00d4c8';
+    ctx.fill(); ctx.shadowBlur = 0;
+  });
+  animId = requestAnimationFrame(drawIntro);
+}
+drawIntro();
+
+setTimeout(() => {
+  document.getElementById('intro').classList.add('hide');
+  document.getElementById('main').classList.add('show');
+  cancelAnimationFrame(animId);
+}, 3200);
+
+// SCROLL REVEAL
+const obs = new IntersectionObserver(entries => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) setTimeout(() => e.target.classList.add('visible'), i * 60);
+  });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
+</script>
+</body>
+</html>
